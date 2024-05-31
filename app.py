@@ -7,12 +7,12 @@ def D_to_R(teta):
     global R_teta
     R_teta = ((math.pi)*teta)/180
 
-teta1 = 0
-teta2 = 30
-teta3 = -45
+
+SS = [0, 30, -45]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')
 
+#Reduced Stiffnes Matrix
 def Q_(Q, teta):
     tetat = D_to_R(teta)
     
@@ -23,10 +23,32 @@ def Q_(Q, teta):
     Q_21 = Q_12
     Q_22 = (Q[0,0]*math.sin(R_teta)**4) + (Q[1,1]*math.cos(R_teta)**4) + 2*( Q[0,1] + 2*Q[2,2] )*(math.sin(R_teta)**2)*(math.cos(R_teta)**2)
     Q_26 = ( Q[0,0] - Q[0,1] -2*Q[2,2] )*((math.cos(R_teta))*(math.sin(R_teta)**3)) - ( Q[1,1] - Q[0,1] -2*Q[2,2] )*(math.cos(R_teta)**3)*(math.sin(R_teta))
+
+    Q_61 = Q_16
+    Q_62 = Q_26
     Q_66 = (Q[0,0] + Q[1,1] - 2*Q[0,1] -2*Q[2,2])*(math.sin(R_teta)**2)*(math.cos(R_teta)**2) + Q[2,2]*(math.sin(R_teta)**4 + math.cos(R_teta)**4)
+    Q__ = np.matrix([[Q_11 ,Q_12 ,Q_16], [Q_21, Q_22, Q_26], [Q_16, Q_26, Q_66]])
+    return Q__
     globals().update(locals())
+    
 
-Q_(Q1, teta3)
+Q_(Q1, SS[1])
 
-print(Q_16)
+#locations of the ply surfaces
+h0 = -0.0075
+h1 = -0.0025
+h2 = 0.0025
+h3 = 0.0075
 
+h = [-0.0075, -0.0025, 0.0025, 0.0075]
+
+# A Matrix
+
+A = np.zeros((3,3))
+
+for i in range(0,3):
+    A += Q_(Q1, SS[i])*(h[i+1] - h[i])
+
+print(A)
+    
+    
