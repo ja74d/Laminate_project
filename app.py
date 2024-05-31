@@ -39,7 +39,7 @@ Q_(Q1, SS[1])
 #h = [-0.0075, -0.0025, 0.0025, 0.0075]
 
 # number of layers
-nl = 3
+nl = len(SS)
 #ply thickness
 h_ = 0.005
 
@@ -51,8 +51,6 @@ for n in range(0, nl):
     hi = h[n] + h_
     h.append(hi)
 
-
-print(h)
 
 # A Matrix
 
@@ -75,4 +73,3 @@ D = np.zeros((3, 3))
 for k in range(0, 3):
     D += 0.3333*(Q_(Q1, SS[k])*((h[k+1])**3 - (h[k])**3))
 
-print(D)
