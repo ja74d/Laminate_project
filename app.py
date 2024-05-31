@@ -56,4 +56,11 @@ B = np.zeros((3, 3))
 for j in range(0, 3):
     B += 0.5*(Q_(Q1, SS[j])*((h[j+1])**2 - (h[j])**2))
 
-print(B)
+# D Matrix
+
+D = np.zeros((3, 3))
+
+for k in range(0, 3):
+    D += 0.3333*(Q_(Q1, SS[k])*((h[k+1])**3 - (h[k])**3))
+
+print(D)
