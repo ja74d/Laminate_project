@@ -35,12 +35,24 @@ def Q_(Q, teta):
 Q_(Q1, SS[1])
 
 #locations of the ply surfaces
-h0 = -0.0075
-h1 = -0.0025
-h2 = 0.0025
-h3 = 0.0075
 
-h = [-0.0075, -0.0025, 0.0025, 0.0075]
+#h = [-0.0075, -0.0025, 0.0025, 0.0075]
+
+# number of layers
+nl = 3
+#ply thickness
+h_ = 0.005
+
+midplane = nl*h_
+h0 = ((-1)*midplane/2)
+h = [h0]
+
+for n in range(0, nl):
+    hi = h[n] + h_
+    h.append(hi)
+
+
+print(h)
 
 # A Matrix
 
