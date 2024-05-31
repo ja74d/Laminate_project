@@ -7,7 +7,7 @@ def D_to_R(teta):
     global R_teta
     R_teta = ((math.pi)*teta)/180
 
-
+# Stacking Sequence
 SS = [0, 30, -45]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')
@@ -49,6 +49,11 @@ A = np.zeros((3,3))
 for i in range(0,3):
     A += Q_(Q1, SS[i])*(h[i+1] - h[i])
 
-print(A)
-    
-    
+# B Matrix
+
+B = np.zeros((3, 3))
+
+for j in range(0, 3):
+    B += 0.5*(Q_(Q1, SS[j])*((h[j+1])**2 - (h[j])**2))
+
+print(B)
