@@ -98,4 +98,14 @@ Vxy = -( (A_prime[0,1])/(A_prime[0,0]) )
 
 Vyx = -( (A_prime[0,1])/(A_prime[1,1]) )
 
-print(Vyx)
+#Flexural Engineering constants
+
+Exf = 12/( (midplane**3)*(D_prime[0,0]) )
+
+Eyf = 12/((midplane**3)*(D_prime[1,1]))
+
+Gxyf = 12/((midplane**3)*(D_prime[2,2]))
+
+Vxyf = -( (D_prime[0,1])/(D_prime[0,0]) )
+
+Vyxf = -( (D_prime[0,1])/(D_prime[1,1]) )
