@@ -8,7 +8,7 @@ def D_to_R(teta):
     R_teta = ((math.pi)*teta)/180
 
 # Stacking Sequence
-SS = [0, 30, -45]
+SS = [0, 90, 0]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')
 
@@ -59,6 +59,12 @@ A = np.zeros((3,3))
 for i in range(0,3):
     A += Q_(Q1, SS[i])*(h[i+1] - h[i])
 
+A_prime = np.linalg.inv(A)
+
+print(A)
+
+#print(A)
+
 # B Matrix
 
 B = np.zeros((3, 3))
@@ -66,6 +72,9 @@ B = np.zeros((3, 3))
 for j in range(0, 3):
     B += 0.5*(Q_(Q1, SS[j])*((h[j+1])**2 - (h[j])**2))
 
+B_prime = np.linalg.inv(B)
+
+#print(B)
 # D Matrix
 
 D = np.zeros((3, 3))
@@ -73,3 +82,20 @@ D = np.zeros((3, 3))
 for k in range(0, 3):
     D += 0.3333*(Q_(Q1, SS[k])*((h[k+1])**3 - (h[k])**3))
 
+D_prime = np.linalg.inv(D)
+
+#print(D)
+
+#in-plane Engineering constants
+
+Ex = 1/(A_prime[0,0]*midplane)
+
+Ey = 1/(A_prime[1,1]*midplane)
+
+Gxy = 1/(A_prime[2,2]*midplane)
+
+Vxy = -( (A_prime[0,1])/(A_prime[0,0]) )
+
+Vyx = -( (A_prime[0,1])/(A_prime[1,1]) )
+
+print(Vyx)
