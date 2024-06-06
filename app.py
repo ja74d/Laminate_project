@@ -6,6 +6,7 @@ import math
 def D_to_R(teta):
     global R_teta
     R_teta = ((math.pi)*teta)/180
+    return R_teta
 
 # Stacking Sequence
 SS = [0, 90, 0]
@@ -61,7 +62,7 @@ for i in range(0,3):
 
 A_prime = np.linalg.inv(A)
 
-print(A)
+
 
 #print(A)
 
@@ -109,3 +110,47 @@ Gxyf = 12/((midplane**3)*(D_prime[2,2]))
 Vxyf = -( (D_prime[0,1])/(D_prime[0,0]) )
 
 Vyxf = -( (D_prime[0,1])/(D_prime[1,1]) )
+
+#T and C
+
+Q_0 = Q_(Q1, 0)
+#print(Q_0)
+
+Q_90 = Q_(Q1, 90)
+#print(Q_90)
+
+alpha_local = np.matrix('0.2e-07; 0.225e-04; 0')
+
+alpha_0 = alpha_local
+
+alpha_90 = np.matrix('0.225e-04; 0.2e-07; 0')
+
+delta_T = -75
+
+#Failure of the laminate
+
+N = np.matrix('1; 0; 0')
+
+midplane_strains = A_prime*N
+
+midplane_Streses = Q1*midplane_strains
+
+TR = np.zeros((3, 3))
+
+
+def TR_m(teta):
+    TR[0,0] = (math.cos(D_to_R(0)))**2
+    TR[0,1] = (math.sin(D_to_R(0)))**2
+    TR[0,2] = 2*(math.cos(D_to_R(0)))*(math.sin(D_to_R(0)))
+    TR[1,0] = TR[0,1]
+    TR[1,1] = (math.cos(D_to_R(0)))**2 
+    TR[1,2] =-2*(math.cos(D_to_R(0)))*(math.sin(D_to_R(0)))
+    TR[2,0] = TR[0,2]
+    TR[2,1] = TR[1,2]
+    TR[2,2] = math.cos(D_to_R(0))**2 - math.sin(D_to_R(0))**2
+    globals().update(locals())
+
+TR_m(0)
+
+
+print(TT)
