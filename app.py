@@ -287,4 +287,20 @@ M_strains = []
 for f in range(len(SST)):
     M_strain = strains_tc[f] - strain_T[f]
     M_strains.append(M_strain)
-print(M_strains)
+#print(M_strains)
+
+# M stresses
+repeated_list = [num for num in h[1:-1] for _ in range(2)]
+h = [h[0]] + repeated_list + [h[-1]]
+
+SST = [num for num in SS for _ in range(2)]
+
+stresses = []
+
+a = 0
+for z in SST:
+    stress = Q_(Q1, SST[a]) @ M_strains[a]
+    stresses.append(stress)
+    a += 1
+#print(stresses)
+
