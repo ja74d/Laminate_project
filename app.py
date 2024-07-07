@@ -211,8 +211,18 @@ for z in h:
 #locals
 local_stresses = []
 x = 0
-for r in stresses:
-    local_stress = TR_M(SS[x]) @ r
+for r in SS:
+    local_stress = TR_M(SS[x]) @ stresses[x]
     x += 1
     local_stresses.append(local_stress)
-print(local_stresses)
+
+y = 0
+local_strains = []
+for f in SS:
+    strn = np.matrix('1, 0, 0; 0, 1, 0; 0, 0, 0.5') @ strains[y]
+    local_strain = TR_M(SS[y]) @ strn
+    y += 1
+    local_strains.append(local_strain)
+print(local_strains)
+
+#print(local_stresses)
