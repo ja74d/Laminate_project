@@ -140,9 +140,9 @@ def TR_M(deg):
     TR[0,2] = 2*(math.cos(D_to_R(deg)))*(math.sin(D_to_R(deg)))
     TR[1,0] = TR[0,1]
     TR[1,1] = (math.cos(D_to_R(deg)))**2 
-    TR[1,2] =-2*(math.cos(D_to_R(deg)))*(math.sin(D_to_R(deg)))
-    TR[2,0] = TR[0,2]
-    TR[2,1] = TR[1,2]
+    TR[1,2] = -2*(math.cos(D_to_R(deg)))*(math.sin(D_to_R(deg)))
+    TR[2,0] = -(math.cos(D_to_R(deg)))*(math.sin(D_to_R(deg)))
+    TR[2,1] = (math.cos(D_to_R(deg)))*(math.sin(D_to_R(deg)))
     TR[2,2] = math.cos(D_to_R(deg))**2 - math.sin(D_to_R(deg))**2
     globals().update(locals())
     return TR
@@ -207,3 +207,12 @@ for z in h:
     a += 1
     strains.append(strain)
     stresses.append(stress)
+
+#locals
+local_stresses = []
+x = 0
+for r in stresses:
+    local_stress = TR_M(SS[x]) @ r
+    x += 1
+    local_stresses.append(local_stress)
+print(local_stresses)
