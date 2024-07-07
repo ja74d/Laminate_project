@@ -185,6 +185,9 @@ k_prime = np.linalg.inv(k)
 
 N = np.matrix('1000; 1000; 0; 0; 0; 0')
 
-e0 = k_prime @ N
+#mid-plane strain and curve
 
-print(e0)
+e0k = k_prime @ N
+
+e0 = e0k[0:3, 0:1]
+kapa = e0k[3:6, 0:1]
