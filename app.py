@@ -9,7 +9,7 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 30,-45]
+SS = [0, 30, -45]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
@@ -41,6 +41,7 @@ def Q_(Q, teta):
 
 # number of layers
 nl = len(SS)
+
 #ply thickness
 h_ = 0.005
 
@@ -57,7 +58,7 @@ for n in range(0, nl):
 
 A = np.zeros((3,3))
 
-for i in range(0,3):
+for i in range(0,len(SS)):
     A += Q_(Q1, SS[i])*(h[i+1] - h[i])
 
 A_prime = np.linalg.inv(A)
@@ -70,7 +71,7 @@ A_prime = np.linalg.inv(A)
 
 B = np.zeros((3, 3))
 
-for j in range(0, 3):
+for j in range(0, len(SS)):
     B += 0.5*(Q_(Q1, SS[j])*((h[j+1])**2 - (h[j])**2))
 
 B_prime = np.linalg.inv(B)
@@ -80,7 +81,7 @@ B_prime = np.linalg.inv(B)
 
 D = np.zeros((3, 3))
 
-for k in range(0, 3):
+for k in range(0, len(SS)):
     D += 0.3333*(Q_(Q1, SS[k])*((h[k+1])**3 - (h[k])**3))
 
 D_prime = np.linalg.inv(D)
@@ -216,6 +217,8 @@ for r in SS:
     x += 1
     local_stresses.append(local_stress)
 
+#print(local_stresses)
+
 y = 0
 local_strains = []
 for f in SS:
@@ -223,6 +226,7 @@ for f in SS:
     local_strain = TR_M(SS[y]) @ strn
     y += 1
     local_strains.append(local_strain)
+
 print(local_strains)
 
-#print(local_stresses)
+
