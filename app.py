@@ -213,27 +213,25 @@ for f in SST:
 #print(local_strains)
 
 
-#T and C
+#T and C (hygrothermal)
 
-Q_0 = Q_(Q1, 0)
-#print(Q_0)
-
-Q_90 = Q_(Q1, 90)
-#print(Q_90)
+delta_T = -75
 
 alpha_local = np.matrix('0.2e-07; 0.225e-04; 0')
 
 alpha_global = []
+strain_T = []
+
 for e in range(len(SS)):
     alpha = TR_M(SS[e]) @ alpha_local
     alpha_global.append(alpha)
+    stn = alpha_global[e]*delta_T
+    strain_T.append(stn)
+#print(strain_T)
 
-delta_T = -75
+repeated_list3 = [num for num in strain_T[1:-1] for _ in range(2)]
+strain_T = [strain_T[0]] + repeated_list + [strain_T[-1]]
 
-R_S_Q = []
-for l in range(len(SS)):
-    q = Q_(Q1, SS[l])
-    R_S_Q.append(q)
 
 Ntc = np.zeros((3, 1))
 Mtc = np.zeros((3, 1))
@@ -265,3 +263,28 @@ MN[3, 0] = Mtc[0, 0]
 MN[4, 0] = Mtc[1, 0]
 MN[5, 0] = Mtc[2, 0]
 
+repeated_list = [num for num in h[1:-1] for _ in range(2)]
+h = [h[0]] + repeated_list + [h[-1]]
+
+e0ktc = k_prime@MN
+
+e0_tc = e0ktc[0:3, 0:1]
+kapa_tc = e0ktc[3:6, 0:1]
+
+
+strains_tc = []
+
+for z in h:
+    strain = e0_tc + (z)*kapa_tc
+    strains_tc.append(strain)
+
+#print(strains_tc)
+
+#print(strain_T)
+
+# Mechanical Strains
+M_strains = []
+for f in range(len(SST)):
+    M_strain = strains_tc[f] - strain_T[f]
+    M_strains.append(M_strain)
+print(M_strains)
