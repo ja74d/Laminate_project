@@ -9,9 +9,9 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 90, 0]
+SS = [0, 30, -45]
 
-Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')
+Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
 #Reduced Stiffnes Matrix
 def Q_(Q, teta):
@@ -148,25 +148,43 @@ def TR_M(deg):
     return TR
 
 
-#local stress matrix for all layers in stacking sequence
+#Stiffness Matrix of the laminate
 
-# strains of each layer
+#k = np.block([ [A, B], [B, A] ])
 
-N = np.matrix('1; 0; 0')
+k = np.zeros((6, 6))
 
-midplane_strains = A_prime*N
+k[0,0] = A[0,0]
+k[0, 1] = k[1, 0] = A[0, 1]
+k[0, 2] = k[2, 0] = A[0, 2]
+k[0, 3] = k[3, 0] = B[0, 0]
+k[0, 4] = k[4, 0] = B[0, 1]
+k[0, 5] = k[5, 0] = B[0, 2]
 
-local_stresses = []
-local_straines = []
+k[1, 1] = A[1, 1]
+k[1, 2] = k[2, 1] = A[1, 2]
+k[1, 3] = k[3, 1] = B[1, 0]
+k[1, 4] = k[4, 1] = B[1, 1]
+k[1, 5] = k[5, 1] = B[1, 2]
 
-for q in SS:
-    TR_M(q)
-    local_strain = TR*midplane_strains
-    local_straines.append(local_strain)
-    #print(local_strains)
-    local_stress = TR*Q_(Q1, q)*midplane_strains
-    local_stresses.append(local_stress)
-    #print(local_Streses)
+k[2, 2] = A[2, 2]
+k[2, 3] = k[3, 2] = B[2, 0]
+k[2, 4] = k[4, 2] = B[2, 1]
+k[2, 5] = k[5, 2] = B[2, 2]
 
+k[3, 3] = D[0, 0]
+k[3, 4] = k[4, 3] = D[0, 1]
+k[3, 5] = k[5, 3] = D[0, 2] 
 
+k[4, 4] = D[1, 1]
+k[4, 5] = k[5, 4] = D[1, 2]
 
+k[5, 5] = D[2, 2]
+
+k_prime = np.linalg.inv(k)
+
+N = np.matrix('1000; 1000; 0; 0; 0; 0')
+
+e0 = k_prime @ N
+
+print(e0)
