@@ -9,7 +9,7 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 30, -45]
+SS = [0, 30,-45]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
@@ -191,3 +191,12 @@ e0k = k_prime @ N
 
 e0 = e0k[0:3, 0:1]
 kapa = e0k[3:6, 0:1]
+
+repeated_list = [num for num in h[1:-1] for _ in range(2)]
+h = [h[0]] + repeated_list + [h[-1]]
+
+strains = []
+for z in h:
+    strain = e0 + (z)*kapa
+    strains.append(strain)
+
