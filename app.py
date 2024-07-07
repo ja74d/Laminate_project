@@ -9,7 +9,7 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 30, -45]
+SS = [0, 90]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
@@ -112,23 +112,7 @@ Vxyf = -( (D_prime[0,1])/(D_prime[0,0]) )
 
 Vyxf = -( (D_prime[0,1])/(D_prime[1,1]) )
 
-#T and C
 
-Q_0 = Q_(Q1, 0)
-#print(Q_0)
-
-Q_90 = Q_(Q1, 90)
-#print(Q_90)
-
-alpha_local = np.matrix('0.2e-07; 0.225e-04; 0')
-
-alpha_0 = alpha_local
-
-alpha_90 = np.matrix('0.225e-04; 0.2e-07; 0')
-
-delta_T = -75
-
-#Failure of the laminate#
 
 
 #the matrix that moves global stress to local stress
@@ -184,7 +168,7 @@ k[5, 5] = D[2, 2]
 
 k_prime = np.linalg.inv(k)
 
-N = np.matrix('1000; 1000; 0; 0; 0; 0')
+N = np.matrix('1; 0; 0; 0; 0; 0')
 
 #mid-plane strain and curve
 
@@ -196,15 +180,14 @@ kapa = e0k[3:6, 0:1]
 repeated_list = [num for num in h[1:-1] for _ in range(2)]
 h = [h[0]] + repeated_list + [h[-1]]
 
-SS = [num for num in SS for _ in range(2)]
-print(SS)
+SST = [num for num in SS for _ in range(2)]
 
 a = 0
 strains = []
 stresses = []
 for z in h:
     strain = e0 + (z)*kapa
-    stress = Q_(Q1, SS[a]) @ strain
+    stress = Q_(Q1, SST[a]) @ strain
     a += 1
     strains.append(strain)
     stresses.append(stress)
@@ -212,8 +195,8 @@ for z in h:
 #locals
 local_stresses = []
 x = 0
-for r in SS:
-    local_stress = TR_M(SS[x]) @ stresses[x]
+for r in SST:
+    local_stress = TR_M(SST[x]) @ stresses[x]
     x += 1
     local_stresses.append(local_stress)
 
@@ -221,12 +204,64 @@ for r in SS:
 
 y = 0
 local_strains = []
-for f in SS:
+for f in SST:
     strn = np.matrix('1, 0, 0; 0, 1, 0; 0, 0, 0.5') @ strains[y]
-    local_strain = TR_M(SS[y]) @ strn
+    local_strain = TR_M(SST[y]) @ strn
     y += 1
     local_strains.append(local_strain)
 
-print(local_strains)
+#print(local_strains)
 
+
+#T and C
+
+Q_0 = Q_(Q1, 0)
+#print(Q_0)
+
+Q_90 = Q_(Q1, 90)
+#print(Q_90)
+
+alpha_local = np.matrix('0.2e-07; 0.225e-04; 0')
+
+alpha_global = []
+for e in range(len(SS)):
+    alpha = TR_M(SS[e]) @ alpha_local
+    alpha_global.append(alpha)
+
+delta_T = -75
+
+R_S_Q = []
+for l in range(len(SS)):
+    q = Q_(Q1, SS[l])
+    R_S_Q.append(q)
+
+Ntc = np.zeros((3, 1))
+Mtc = np.zeros((3, 1))
+
+#ply thickness
+h_ = 0.005
+
+midplane = nl*h_
+h0 = ((-1)*midplane/2)
+h = [h0]
+
+for n in range(0, nl):
+    hi = h[n] + h_
+    h.append(hi)
+
+
+for u in range(0, len(SS)):
+    Ntc += delta_T*(Q_(Q1, SS[u])@alpha_global[u])*(h[u+1] - h[u])
+
+for v in range(0, len(SS)):
+    Mtc += (0.5*delta_T)*(Q_(Q1, SS[v])@alpha_global[v])*((h[v+1])**2 - (h[v])**2)
+
+MN = np.zeros((6, 1))
+MN[0, 0] = Ntc[0, 0]
+MN[1, 0] = Ntc[1, 0]
+MN[2, 0] = Ntc[2, 0]
+
+MN[3, 0] = Mtc[0, 0]
+MN[4, 0] = Mtc[1, 0]
+MN[5, 0] = Mtc[2, 0]
 
