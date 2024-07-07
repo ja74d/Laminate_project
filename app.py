@@ -195,8 +195,15 @@ kapa = e0k[3:6, 0:1]
 repeated_list = [num for num in h[1:-1] for _ in range(2)]
 h = [h[0]] + repeated_list + [h[-1]]
 
+SS = [num for num in SS for _ in range(2)]
+print(SS)
+
+a = 0
 strains = []
+stresses = []
 for z in h:
     strain = e0 + (z)*kapa
+    stress = Q_(Q1, SS[a]) @ strain
+    a += 1
     strains.append(strain)
-
+    stresses.append(stress)
