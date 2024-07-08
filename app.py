@@ -137,34 +137,40 @@ def TR_M(deg):
 
 #k = np.block([ [A, B], [B, A] ])
 
-k = np.zeros((6, 6))
 
-k[0,0] = A[0,0]
-k[0, 1] = k[1, 0] = A[0, 1]
-k[0, 2] = k[2, 0] = A[0, 2]
-k[0, 3] = k[3, 0] = B[0, 0]
-k[0, 4] = k[4, 0] = B[0, 1]
-k[0, 5] = k[5, 0] = B[0, 2]
+def k(A, B, D):
+    global k
+    k = np.zeros((6, 6))
 
-k[1, 1] = A[1, 1]
-k[1, 2] = k[2, 1] = A[1, 2]
-k[1, 3] = k[3, 1] = B[1, 0]
-k[1, 4] = k[4, 1] = B[1, 1]
-k[1, 5] = k[5, 1] = B[1, 2]
+    k[0,0] = A[0,0]
+    k[0, 1] = k[1, 0] = A[0, 1]
+    k[0, 2] = k[2, 0] = A[0, 2]
+    k[0, 3] = k[3, 0] = B[0, 0]
+    k[0, 4] = k[4, 0] = B[0, 1]
+    k[0, 5] = k[5, 0] = B[0, 2]
 
-k[2, 2] = A[2, 2]
-k[2, 3] = k[3, 2] = B[2, 0]
-k[2, 4] = k[4, 2] = B[2, 1]
-k[2, 5] = k[5, 2] = B[2, 2]
+    k[1, 1] = A[1, 1]
+    k[1, 2] = k[2, 1] = A[1, 2]
+    k[1, 3] = k[3, 1] = B[1, 0]
+    k[1, 4] = k[4, 1] = B[1, 1]
+    k[1, 5] = k[5, 1] = B[1, 2]
 
-k[3, 3] = D[0, 0]
-k[3, 4] = k[4, 3] = D[0, 1]
-k[3, 5] = k[5, 3] = D[0, 2] 
+    k[2, 2] = A[2, 2]
+    k[2, 3] = k[3, 2] = B[2, 0]
+    k[2, 4] = k[4, 2] = B[2, 1]
+    k[2, 5] = k[5, 2] = B[2, 2]
 
-k[4, 4] = D[1, 1]
-k[4, 5] = k[5, 4] = D[1, 2]
+    k[3, 3] = D[0, 0]
+    k[3, 4] = k[4, 3] = D[0, 1]
+    k[3, 5] = k[5, 3] = D[0, 2] 
 
-k[5, 5] = D[2, 2]
+    k[4, 4] = D[1, 1]
+    k[4, 5] = k[5, 4] = D[1, 2]
+
+    k[5, 5] = D[2, 2]
+    return k
+
+k(A, B, D)
 
 k_prime = np.linalg.inv(k)
 
@@ -307,8 +313,6 @@ for z in SST:
 
 # Tsi-Wu Failure theory
 
-
-
 F1t = 1500e+06
 F1c = 1500e+06
 F2t = 40e+06
@@ -327,6 +331,8 @@ f12 = (-0.5) * (1/(F1c*F1t*F2t*F2c))**0.5
 #f12 = -1/(2*((F1t)*(F1t)))
 #f12 = -3.36032e-18
 
+Tsi_wu = []
+Tsi_wu_stress = []
 aa = 0
 for st in local_stresses:
     sigma1 = local_stresses[aa][0]
@@ -341,12 +347,44 @@ for st in local_stresses:
     #print(TW)
 
     # SR
-
     a = ( (f11*((sigma1)**2)) + (f22*((sigma2)**2)) + (f66*((tau)**2)) + (2*f12*sigma1*sigma2) )
     b = ( (f1*sigma1) + (f2*sigma2) )
-    c = -1
-    
+    c = -1 
 
     SR = np.roots([a, b, c])
+    #print(SR)
+    for b in SR:
+        if b > 0:
+            Tsi_wu.append(b)
+            Tsi_wu_stress.append(b/((len(SS))*h_))
 
-    print(SR)
+#print(Tsi_wu)
+#print(Tsi_wu_stress)
+
+#Tsi-hill
+Tsi_hill = []
+Tsi_hill_stress = []
+aa = 0
+for ts in local_stresses:
+    sigma1 = local_stresses[aa][0]
+    sigma1 = float(sigma1)
+    sigma2 = local_stresses[aa][1]
+    sigma2 = float(sigma2)
+    tau = local_stresses[aa][2]
+    tau = float(tau)
+    aa += 1
+
+    TH = (1/((sigma1/F1t)**2+(sigma2/F2t)**2+(tau/F6)**2-((sigma1*sigma2)/(F1t**2))))**0.5
+    Tsi_hill.append(TH)
+for g in Tsi_hill:
+    vb = g/((len(SS))*(h_))
+    Tsi_hill_stress.append(vb)
+
+#print(Tsi_hill)
+#print(Tsi_hill_stress)
+#print(Tsi_hill_stress)
+
+first = Tsi_hill_stress.index(min(Tsi_hill_stress))
+
+first_layar_failure = SS[int(first/2)]
+
