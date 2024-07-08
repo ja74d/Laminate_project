@@ -9,7 +9,7 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 90]
+SS = [0, 90, 0]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
@@ -304,3 +304,49 @@ for z in SST:
     a += 1
 #print(stresses)
 
+
+# Tsi-Wu Failure theory
+
+
+
+F1t = 1500e+06
+F1c = 1500e+06
+F2t = 40e+06
+F2c = 246e+06
+F6 = 68e+06
+
+f1 = (1/(F1t)) - (1/(F1c))
+f11 = 1/((F1t)*(F1c))
+
+f2 = (1/(F2t)) - (1/(F2c))
+f22 = 1/((F2t)*(F2c))
+
+f66 = 1/((F6)*(F6))
+
+f12 = -1/(2*((F1t)*(F1t)))
+#f12 = -3.36032e-18
+
+aa = 0
+for st in local_stresses:
+    sigma1 = local_stresses[aa][0]
+    sigma1 = float(sigma1)
+    sigma2 = local_stresses[aa][1]
+    sigma2 = float(sigma2)
+    tau = local_stresses[aa][2]
+    tau = float(tau)
+
+    TW = ((f1)*(sigma1)) + ((f2)*(sigma2)) + ((f11)*(sigma1)**2) + ((f22)*(sigma2)**2) + ((f66)*(tau)**2) + ((2)*(f12)*(sigma1)*(sigma2))
+    aa += 1
+    #print(TW)
+
+    # SR
+
+    a = ( (f11*((sigma1)**2)) + (f22*((sigma2)**2)) + (f66*((tau)**2)) + (2*f12*sigma1*sigma2) )
+    b = ( (f1*sigma1) + (f2*sigma2) )
+    c = -1
+    
+
+    SR = np.roots([a, b, c])
+
+    print(SR)
+#print(local_stresses)
