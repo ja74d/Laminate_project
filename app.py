@@ -323,7 +323,8 @@ f22 = 1/((F2t)*(F2c))
 
 f66 = 1/((F6)*(F6))
 
-f12 = -1/(2*((F1t)*(F1t)))
+f12 = (-0.5) * (1/(F1c*F1t*F2t*F2c))**0.5
+#f12 = -1/(2*((F1t)*(F1t)))
 #f12 = -3.36032e-18
 
 aa = 0
@@ -349,4 +350,3 @@ for st in local_stresses:
     SR = np.roots([a, b, c])
 
     print(SR)
-#print(local_stresses)
