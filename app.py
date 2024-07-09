@@ -81,8 +81,8 @@ B_prime = np.linalg.inv(B)
 
 D = np.zeros((3, 3))
 
-for k in range(0, len(SS)):
-    D += 0.3333*(Q_(Q1, SS[k])*((h[k+1])**3 - (h[k])**3))
+for ka in range(0, len(SS)):
+    D += (1/3)*(Q_(Q1, SS[ka])*((h[ka+1])**3 - (h[ka])**3))
 
 D_prime = np.linalg.inv(D)
 
@@ -135,50 +135,32 @@ def TR_M(deg):
 
 #Stiffness Matrix of the laminate
 
-#k = np.block([ [A, B], [B, A] ])
-
-
-def k(A, B, D):
+def ABD(a11, b11, c11):
     global k
-    k = np.zeros((6, 6))
+    global k_prime
+    # Compute the 2x2 block matrix
+    k = np.block([[a11, b11], [b11, c11]])
 
-    k[0,0] = A[0,0]
-    k[0, 1] = k[1, 0] = A[0, 1]
-    k[0, 2] = k[2, 0] = A[0, 2]
-    k[0, 3] = k[3, 0] = B[0, 0]
-    k[0, 4] = k[4, 0] = B[0, 1]
-    k[0, 5] = k[5, 0] = B[0, 2]
+    # Flatten the matrix into a 1D array
+    ka = k.flatten()
 
-    k[1, 1] = A[1, 1]
-    k[1, 2] = k[2, 1] = A[1, 2]
-    k[1, 3] = k[3, 1] = B[1, 0]
-    k[1, 4] = k[4, 1] = B[1, 1]
-    k[1, 5] = k[5, 1] = B[1, 2]
+    # Convert the flattened array back to a 6x6 matrix
+    k = ka.reshape(6, 6)
 
-    k[2, 2] = A[2, 2]
-    k[2, 3] = k[3, 2] = B[2, 0]
-    k[2, 4] = k[4, 2] = B[2, 1]
-    k[2, 5] = k[5, 2] = B[2, 2]
+    # Compute the inverse of k
+    k_prime = np.linalg.inv(k)
 
-    k[3, 3] = D[0, 0]
-    k[3, 4] = k[4, 3] = D[0, 1]
-    k[3, 5] = k[5, 3] = D[0, 2] 
+    return k, k_prime
 
-    k[4, 4] = D[1, 1]
-    k[4, 5] = k[5, 4] = D[1, 2]
 
-    k[5, 5] = D[2, 2]
-    return k
-
-k(A, B, D)
-
-k_prime = np.linalg.inv(k)
+ABD(A, B, D)
+#print(k)
 
 N = np.matrix('1; 0; 0; 0; 0; 0')
 
 #mid-plane strain and curve
 
-e0k = k_prime @ N
+e0k = np.linalg.inv(k) @ N
 
 e0 = e0k[0:3, 0:1]
 kapa = e0k[3:6, 0:1]
@@ -387,4 +369,59 @@ for g in Tsi_hill:
 first = Tsi_hill_stress.index(min(Tsi_hill_stress))
 
 first_layar_failure = SS[int(first/2)]
+
+# now how the fuck i`m spouse to set the stiffness of this layer to zero?
+
+new_stiffness = []
+for lay in SS:
+    if lay == first_layar_failure:
+        #print(np.zeros((3, 3)))
+        new_stiffness.append(np.zeros((3, 3)))
+    else:
+        #print(Q_(Q1, lay))
+        new_stiffness.append(Q_(Q1, lay))
+#print(new_stiffness)
+
+#ply thickness
+h_ = 0.005
+
+midplane = nl*h_
+h0 = ((-1)*midplane/2)
+h = [h0]
+
+for n in range(0, nl):
+    hi = h[n] + h_
+    h.append(hi)
+
+#New A B D
+
+NA = np.zeros((3,3))
+
+for ik in range(0, len(SS)):
+    NA += (new_stiffness[ik])*(h[ik+1] - h[ik])
+#print(NA)
+
+NA_prime = np.linalg.inv(NA)
+
+
+NB = np.zeros((3, 3))
+
+for nj in range(0, len(SS)):
+    NB += 0.5*(new_stiffness[nj])*((h[nj+1])**2 - (h[nj])**2)
+
+#print(NB)
+NB_prime = np.linalg.inv(NB)
+
+ND = np.zeros((3, 3))
+
+for nk in range(0, len(SS)):
+    ND += (1/3)*((new_stiffness[nk])*((h[nk+1])**3 - (h[nk])**3))
+
+ND_prime = np.linalg.inv(ND)
+#print(ND)
+
+ABD(NA, NB, ND)
+print(k)
+
+
 
