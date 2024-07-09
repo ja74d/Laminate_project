@@ -8,6 +8,29 @@ v12 = 0.25
 v21 = ((v12)*E2)/(E1)
 G12 = 7.17e+09
 
+vm = 0.3
+vf = 0.3
+
+Em = 3.4e+09
+Ef = 230e+09
+Gf = Ef/(2*(1+vf))
+Gm = Em/(2*(1+vm))
+
+
+Vf = 0.7
+Vm = 0.3
+def HT():
+    #Halpine Tsi
+    ksi = 1 + (40*(Vf**10))
+    eta = (Ef-Em)/(Ef + (ksi*Em))
+    E2 = ((Em)*(1+ksi*eta*Vf))/(1-eta*Vf)
+    print(E2)
+
+    #G12
+    eta = (Gf-Gm)/(Gf + (ksi*Gm))
+    G12 = ((Gm)*(1+ksi*eta*Vf))/(1-eta*Vf)
+    #print(G12)
+
 Q = np.zeros((3, 3))
 S = np.zeros((3, 3))
 
@@ -335,6 +358,19 @@ f66 = 1/((F6)*(F6))
 f12 = (-0.5) * (1/(F1c*F1t*F2t*F2c))**0.5
 #f12 = -1/(2*((F1t)*(F1t)))
 #f12 = -3.36032e-18
+
+#maximum stresses
+max_stress = []
+for strs in stresses:
+    sigmax = float(strs[0])
+    sigmay = float(strs[1])
+    tau = float(strs[2])
+    simgamxn1 = ((sigmax+sigmay)/2) + (((sigmax-sigmay)/2)**2+(tau)**2)**0.5
+    sigmamxn2 = ((sigmax+sigmay)/2) - (((sigmax-sigmay)/2)**2+(tau)**2)**0.5
+    taumax = (((sigmax-sigmay)/2)**2+(tau)**2)**0.5
+    mxn = [simgamxn1, sigmamxn2, taumax]
+    max_stress.append(mxn)
+print(max_stress)
 
 def Tsiwu(local_stresses):
     global Tsi_wu, Tsi_wu_stress
