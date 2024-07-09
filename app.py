@@ -313,58 +313,62 @@ f12 = (-0.5) * (1/(F1c*F1t*F2t*F2c))**0.5
 #f12 = -1/(2*((F1t)*(F1t)))
 #f12 = -3.36032e-18
 
-Tsi_wu = []
-Tsi_wu_stress = []
-aa = 0
-for st in local_stresses:
-    sigma1 = local_stresses[aa][0]
-    sigma1 = float(sigma1)
-    sigma2 = local_stresses[aa][1]
-    sigma2 = float(sigma2)
-    tau = local_stresses[aa][2]
-    tau = float(tau)
+def Tsiwu(local_stresses):
+    global Tsi_wu, Tsi_wu_stress
+    Tsi_wu = []
+    Tsi_wu_stress = []
+    
+    for st in local_stresses:
+        sigma1 = float(st[0])
+        sigma2 = float(st[1])
+        tau = float(st[2])
 
-    TW = ((f1)*(sigma1)) + ((f2)*(sigma2)) + ((f11)*(sigma1)**2) + ((f22)*(sigma2)**2) + ((f66)*(tau)**2) + ((2)*(f12)*(sigma1)*(sigma2))
-    aa += 1
-    #print(TW)
+        # Calculate TW
+        TW = ((f1)*(sigma1)) + ((f2)*(sigma2)) + ((f11)*(sigma1)**2) + ((f22)*(sigma2)**2) + ((f66)*(tau)**2) + ((2)*(f12)*(sigma1)*(sigma2))
 
-    # SR
-    a = ( (f11*((sigma1)**2)) + (f22*((sigma2)**2)) + (f66*((tau)**2)) + (2*f12*sigma1*sigma2) )
-    b = ( (f1*sigma1) + (f2*sigma2) )
-    c = -1 
+        # Calculate SR
+        a = (f11*((sigma1)**2)) + (f22*((sigma2)**2)) + (f66*((tau)**2)) + (2*f12*sigma1*sigma2)
+        b = (f1*sigma1) + (f2*sigma2)
+        c = -1 
 
-    SR = np.roots([a, b, c])
-    #print(SR)
-    for b in SR:
-        if b > 0:
-            Tsi_wu.append(b)
-            Tsi_wu_stress.append(b/((len(SS))*h_))
+        SR = np.roots([a, b, c])
+        
+        for root in SR:
+            if root > 0:
+                Tsi_wu.append(root)
+                Tsi_wu_stress.append(root / (len(SS) * h_))
 
-#print(Tsi_wu)
-#print(Tsi_wu_stress)
+    return Tsi_wu, Tsi_wu_stress
+
+Tsiwu(local_stresses)
 
 #Tsi-hill
-Tsi_hill = []
-Tsi_hill_stress = []
-aa = 0
-for ts in local_stresses:
-    sigma1 = local_stresses[aa][0]
-    sigma1 = float(sigma1)
-    sigma2 = local_stresses[aa][1]
-    sigma2 = float(sigma2)
-    tau = local_stresses[aa][2]
-    tau = float(tau)
-    aa += 1
+def Tsihill(local_stresses):
+    global Tsi_hill, Tsi_hill_stress
+    Tsi_hill = []
+    Tsi_hill_stress = []
+    aa = 0
+    for ts in local_stresses:
+        sigma1 = local_stresses[aa][0]
+        sigma1 = float(sigma1)
+        sigma2 = local_stresses[aa][1]
+        sigma2 = float(sigma2)
+        tau = local_stresses[aa][2]
+        tau = float(tau)
+        aa += 1
 
-    TH = (1/((sigma1/F1t)**2+(sigma2/F2t)**2+(tau/F6)**2-((sigma1*sigma2)/(F1t**2))))**0.5
-    Tsi_hill.append(TH)
-for g in Tsi_hill:
-    vb = g/((len(SS))*(h_))
-    Tsi_hill_stress.append(vb)
+        TH = (1/((sigma1/F1t)**2+(sigma2/F2t)**2+(tau/F6)**2-((sigma1*sigma2)/(F1t**2))))**0.5
+        Tsi_hill.append(TH)
+    for g in Tsi_hill:
+        vb = g/((len(SS))*(h_))
+        Tsi_hill_stress.append(vb)
 
-#print(Tsi_hill)
-#print(Tsi_hill_stress)
-#print(Tsi_hill_stress)
+    return Tsi_hill, Tsi_hill_stress
+    #print(Tsi_hill)
+    #print(Tsi_hill_stress)
+    #print(Tsi_hill_stress)
+
+Tsihill(local_stresses)
 
 first = Tsi_hill_stress.index(min(Tsi_hill_stress))
 
@@ -449,4 +453,5 @@ new_D(SS, new_stiffness, h)
 ABD(NA, NB, ND)
 
 ek(k)
-print(e0)
+
+Tsiwu(local_stresses)
