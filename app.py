@@ -10,6 +10,7 @@ def D_to_R(teta):
 
 # Stacking Sequence
 SS = [0, 90, 0]
+SST = [num for num in SS for _ in range(2)]
 
 Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
@@ -161,45 +162,43 @@ N = np.matrix('1; 0; 0; 0; 0; 0')
 #mid-plane strain and curve
 
 
-e0k = np.linalg.inv(k) @ N
-
-e0 = e0k[0:3, 0:1]
-kapa = e0k[3:6, 0:1]
-
+ # Extend the h list
 repeated_list = [num for num in h[1:-1] for _ in range(2)]
-h = [h[0]] + repeated_list + [h[-1]]
+h_extended = [h[0]] + repeated_list + [h[-1]]
 
+# Extend the SS list
 SST = [num for num in SS for _ in range(2)]
 
-a = 0
-strains = []
-stresses = []
-for z in h:
-    strain = e0 + (z)*kapa
-    stress = Q_(Q1, SST[a]) @ strain
-    a += 1
-    strains.append(strain)
-    stresses.append(stress)
 
-#locals
-local_stresses = []
-x = 0
-for r in SST:
-    local_stress = TR_M(SST[x]) @ stresses[x]
-    x += 1
-    local_stresses.append(local_stress)
+def ek(k):
+    global local_strains, local_stresses, e0, kapa
+    # Calculate e0 and kapa
+    e0k = np.linalg.inv(k) @ N
+    e0 = e0k[0:3, 0:1]
+    kapa = e0k[3:6, 0:1]
 
-#print(local_stresses)
+   
+    # Calculate strains and stresses
+    strains = []
+    stresses = []
+    for a, z in enumerate(h_extended):
+        strain = e0 + z * kapa
+        stress = Q_(Q1, SST[a]) @ strain
+        strains.append(strain)
+        stresses.append(stress)
 
-y = 0
-local_strains = []
-for f in SST:
-    strn = np.matrix('1, 0, 0; 0, 1, 0; 0, 0, 0.5') @ strains[y]
-    local_strain = TR_M(SST[y]) @ strn
-    y += 1
-    local_strains.append(local_strain)
+    # Calculate local stresses
+    local_stresses = [TR_M(SST[x]) @ stresses[x] for x in range(len(SST))]
 
-#print(local_strains)
+    # Calculate local strains
+    local_strains = []
+    for y, f in enumerate(SST):
+        strn = np.matrix('1, 0, 0; 0, 1, 0; 0, 0, 0.5') @ strains[y]
+        local_strain = TR_M(SST[y]) @ strn
+        local_strains.append(local_strain)
+
+    return local_strains, local_stresses
+ek(k)
 
 
 #T and C (hygrothermal)
@@ -273,7 +272,7 @@ for z in h:
 
 # Mechanical Strains
 M_strains = []
-for f in range(len(SST)):
+for f in range(0, len(SST)):
     M_strain = strains_tc[f] - strain_T[f]
     M_strains.append(M_strain)
 #print(M_strains)
@@ -448,5 +447,6 @@ def new_D(SS, stiffness, h):
 new_D(SS, new_stiffness, h)
 
 ABD(NA, NB, ND)
-#print(k)
 
+ek(k)
+print(e0)
