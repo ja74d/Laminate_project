@@ -2,6 +2,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+E1 = 181e+09
+E2 = 10.3e+09
+v12 = 0.25
+v21 = ((v12)*E2)/(E1)
+G12 = 7.17e+09
+
+Q = np.zeros((3, 3))
+S = np.zeros((3, 3))
+
+S[0, 0] = 1/E1
+S[0, 1] = -v12/E1
+S[0, 2] = 0
+
+S[1, 0] = S[0, 1]
+S[1, 1] = 1/E2
+S[1, 2] = 0
+
+S[2, 0] = 0
+S[2, 1] = 0
+S[2, 2] = 1/G12
+
+Q1 = np.linalg.inv(S)
+
 
 def D_to_R(teta):
     global R_teta
@@ -12,7 +35,7 @@ def D_to_R(teta):
 SS = [0, 90, 0]
 SST = [num for num in SS for _ in range(2)]
 
-Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
+#Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
 
 #Reduced Stiffnes Matrix
 def Q_(Q, teta):
@@ -492,7 +515,7 @@ yd = [0, float(first_ply_stress), float(second_ply_stress)]
 
 plt.plot(xd, yd, marker='o')
 
-plt.show()
+#plt.show()
 
 del SS[int(second/2)]
 del SS[int(second/2)]
