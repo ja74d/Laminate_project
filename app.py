@@ -160,6 +160,7 @@ N = np.matrix('1; 0; 0; 0; 0; 0')
 
 #mid-plane strain and curve
 
+
 e0k = np.linalg.inv(k) @ N
 
 e0 = e0k[0:3, 0:1]
@@ -395,33 +396,57 @@ for n in range(0, nl):
 
 #New A B D
 
-NA = np.zeros((3,3))
+def new_A(SS, stiffness, h):
+    global NA
+    global NA_prime
+    # Initialize NA as a 3x3 zero matrix
+    NA = np.zeros((3, 3))
 
-for ik in range(0, len(SS)):
-    NA += (new_stiffness[ik])*(h[ik+1] - h[ik])
+    # Calculate NA
+    for ik in range(0, len(SS)):
+        NA += stiffness[ik] * (h[ik+1] - h[ik])
+
+    # Calculate the inverse of NA
+    NA_prime = np.linalg.inv(NA)
+
+    return NA, NA_prime
+
+new_A(SS, new_stiffness, h)
 #print(NA)
 
-NA_prime = np.linalg.inv(NA)
+def new_B(SS, stiffness, h):
+    global NB
+    global NB_prime
+    # Initialize NB as a 3x3 zero matrix
+    NB = np.zeros((3, 3))
 
+    # Calculate NB
+    for nj in range(0, len(SS)):
+        NB += 0.5 * stiffness[nj] * ((h[nj+1]) ** 2 - (h[nj]) ** 2)
 
-NB = np.zeros((3, 3))
+    # Calculate the inverse of NB
+    NB_prime = np.linalg.inv(NB)
 
-for nj in range(0, len(SS)):
-    NB += 0.5*(new_stiffness[nj])*((h[nj+1])**2 - (h[nj])**2)
-
+    return NB, NB_prime
+new_B(SS, new_stiffness, h)
 #print(NB)
-NB_prime = np.linalg.inv(NB)
 
-ND = np.zeros((3, 3))
+def new_D(SS, stiffness, h):
+    global ND
+    global ND_prime
+    # Initialize ND as a 3x3 zero matrix
+    ND = np.zeros((3, 3))
 
-for nk in range(0, len(SS)):
-    ND += (1/3)*((new_stiffness[nk])*((h[nk+1])**3 - (h[nk])**3))
+    # Calculate ND
+    for nk in range(0, len(SS)):
+        ND += (1/3) * stiffness[nk] * ((h[nk+1]) ** 3 - (h[nk]) ** 3)
 
-ND_prime = np.linalg.inv(ND)
-#print(ND)
+    # Calculate the inverse of ND
+    ND_prime = np.linalg.inv(ND)
+
+    return ND, ND_prime
+new_D(SS, new_stiffness, h)
 
 ABD(NA, NB, ND)
-print(k)
-
-
+#print(k)
 
