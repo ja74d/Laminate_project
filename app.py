@@ -1,7 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-#Ex = input("Ex(Gpa):")
 
 def D_to_R(teta):
     global R_teta
@@ -374,6 +374,11 @@ first = Tsi_hill_stress.index(min(Tsi_hill_stress))
 
 first_layar_failure = SS[int(first/2)]
 
+
+first_ply_stress = Tsi_wu_stress[first]
+
+first_ply_strain = min(Tsi_wu) * e0[0]
+
 # now how the fuck i`m spouse to set the stiffness of this layer to zero?
 
 new_stiffness = []
@@ -385,9 +390,6 @@ for lay in SS:
         #print(Q_(Q1, lay))
         new_stiffness.append(Q_(Q1, lay))
 #print(new_stiffness)
-
-#ply thickness
-h_ = 0.005
 
 midplane = nl*h_
 h0 = ((-1)*midplane/2)
@@ -452,6 +454,48 @@ new_D(SS, new_stiffness, h)
 
 ABD(NA, NB, ND)
 
+#print(k)
+
 ek(k)
 
+
 Tsiwu(local_stresses)
+
+#print(first)
+
+del Tsi_wu_stress[first]
+if first == (len(SST) - 1):
+    del Tsi_wu_stress[first-1]
+else:
+    del Tsi_wu_stress[first]
+
+del Tsi_wu[first]
+if first == (len(SST) - 1):
+    del Tsi_wu[first-1]
+else:
+    del Tsi_wu[first]
+
+#print(local_stresses)
+
+second = Tsi_wu_stress.index(min(Tsi_wu_stress))
+
+second_layar_failure = SS[int(second/2)]
+
+second_ply_stress = Tsi_wu_stress[second]
+
+second_ply_strain = min(Tsi_wu) * e0[0]
+
+
+
+xd = [0, float(first_ply_strain), float(second_ply_strain)]
+yd = [0, float(first_ply_stress), float(second_ply_stress)]
+
+plt.plot(xd, yd, marker='o')
+
+plt.show()
+
+del SS[int(second/2)]
+del SS[int(second/2)]
+
+last_ply = SS[0]
+#print(last_ply)
