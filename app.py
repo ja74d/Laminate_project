@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 import math
 
-E1 = 181e+09
-E2 = 10.3e+09
-v12 = 0.25
+E1 = 38.6e+09
+E2 = 8.27e+09
+v12 = 0.26
 v21 = ((v12)*E2)/(E1)
-G12 = 7.17e+09
+G12 = 4.14e+09
 
 vm = 0.3
 vf = 0.3
@@ -56,7 +56,10 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 30, -45]
+SS = [30, 45]
+N = np.matrix('10e+08; 0; 0; 0; 0; 0')
+
+
 SST = [num for num in SS for _ in range(2)]
 
 #Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
@@ -124,7 +127,7 @@ B = np.zeros((3, 3))
 for j in range(0, len(SS)):
     B += 0.5*(Q_(Q1, SS[j])*((h[j+1])**2 - (h[j])**2))
 
-B_prime = np.linalg.inv(B)
+#B_prime = np.linalg.inv(B)
 
 #print('B:', B)
 #print()
@@ -152,6 +155,11 @@ Vxy = -( (A_prime[0,1])/(A_prime[0,0]) )
 
 Vyx = -( (A_prime[0,1])/(A_prime[1,1]) )
 
+EC = [Ex, Ey, Gxy, Vxy, Vyx]
+
+CT = pd.DataFrame(EC, index=["Ex", "Ey", "Gxy", "vxy", "vyx"])
+#print(CT)
+
 #Flexural Engineering constants
 
 Exf = 12/( (midplane**3)*(D_prime[0,0]) )
@@ -164,7 +172,9 @@ Vxyf = -( (D_prime[0,1])/(D_prime[0,0]) )
 
 Vyxf = -( (D_prime[0,1])/(D_prime[1,1]) )
 
-
+ECf = [Exf, Eyf, Gxyf, Vxyf, Vyxf]
+FCT = pd.DataFrame(ECf, index=["Exf", "Eyf", "Gxyf", "vxyf", "vyxf"])
+#print(FCT)
 
 
 #the matrix that moves global stress to local stress
@@ -208,7 +218,6 @@ def ABD(a11, b11, c11):
 ABD(A, B, D)
 #print(k)
 
-N = np.matrix('1000; 1000; 0; 0; 0; 0')
 
 #mid-plane strain and curve
 
@@ -222,9 +231,10 @@ SST = [num for num in SS for _ in range(2)]
 
 
 def ek(k):
-    global local_strains, local_stresses, e0, kapa, strains, stresses
+    global local_strains, local_stresses, e0, kapa, strains, stresses, e0k
     # Calculate e0 and kapa
     e0k = np.linalg.inv(k) @ N
+    #e0k = k @ N
     e0 = e0k[0:3, 0:1]
     kapa = e0k[3:6, 0:1]
 
@@ -254,20 +264,22 @@ ek(k)
 #print()
 #print('kapa:\n', kapa)
 
-#tables for stress and strain in top and bottom for each ply
-name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+#print(e0k)
 
-data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, local_strains)}
-df = pd.DataFrame(data, index=['epsilon 1', 'epsilon 2', 'gama'])
+#tables for stress and strain in top and bottom of each ply
+#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+
+#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, local_stresses)}
+#df = pd.DataFrame(data, index=['sigma 1', 'sigma 2', 'tau'])
 
 # Print the DataFrame
 #print(df)
 
 #T and C (hygrothermal)
 
-delta_T = -75
+delta_T = -100
 
-alpha_local = np.matrix('0.2e-07; 0.225e-04; 0')
+alpha_local = np.matrix('8.6e-06; 22.1e-06; 0')
 
 alpha_global = []
 strain_T = []
@@ -278,6 +290,40 @@ for e in range(len(SS)):
     stn = alpha_global[e]*delta_T
     strain_T.append(stn)
 #print(strain_T)
+#print(alpha_global)
+
+#name = [f'{SS[0]}', f'{SS[1]}', f'{SS[2]}']
+
+#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, alpha_global)}
+#df = pd.DataFrame(data, index=['alpha x', 'alpha y', 'alpha xy'])
+
+# Print the DataFrame
+#print(df)
+
+#Bta
+
+delta_c = 0.05
+
+bta_local = np.matrix('0; 0.6; 0')
+
+bta_global = []
+strain_c = []
+
+for ec in range(len(SS)):
+    bta = TR_M(SS[ec]) @ bta_local
+    bta_global.append(bta)
+    stnb = bta_global[ec]*delta_c
+    strain_c.append(stnb)
+#print(strain_c)
+#print(bta_global)
+
+#name = [f'{SS[0]}', f'{SS[1]}', f'{SS[2]}']
+
+#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, bta_global)}
+#df = pd.DataFrame(data, index=['bta x', 'bta y', 'bta xy'])
+
+# Print the DataFrame
+#print(df)
 
 repeated_list3 = [num for num in strain_T[1:-1] for _ in range(2)]
 strain_T = [strain_T[0]] + repeated_list + [strain_T[-1]]
@@ -299,10 +345,10 @@ for n in range(0, nl):
 
 
 for u in range(0, len(SS)):
-    Ntc += delta_T*(Q_(Q1, SS[u])@alpha_global[u])*(h[u+1] - h[u])
+    Ntc += (delta_T*(Q_(Q1, SS[u])@alpha_global[u])*(h[u+1] - h[u])) + (delta_c*(Q_(Q1, SS[u])@bta_global[u])*(h[u+1] - h[u]))
 
 for v in range(0, len(SS)):
-    Mtc += (0.5*delta_T)*(Q_(Q1, SS[v])@alpha_global[v])*((h[v+1])**2 - (h[v])**2)
+    Mtc += (0.5*delta_T)*(Q_(Q1, SS[v])@alpha_global[v])*((h[v+1])**2 - (h[v])**2) + (0.5*delta_c)*(Q_(Q1, SS[v])@bta_global[v])*((h[v+1])**2 - (h[v])**2)
 
 MN = np.zeros((6, 1))
 MN[0, 0] = Ntc[0, 0]
@@ -313,14 +359,24 @@ MN[3, 0] = Mtc[0, 0]
 MN[4, 0] = Mtc[1, 0]
 MN[5, 0] = Mtc[2, 0]
 
+#print('Ntc:\n', Ntc)
+#print()
+#print('Mtc:\n', Mtc)
+
 repeated_list = [num for num in h[1:-1] for _ in range(2)]
 h = [h[0]] + repeated_list + [h[-1]]
+
+
 
 e0ktc = k_prime@MN
 
 e0_tc = e0ktc[0:3, 0:1]
-kapa_tc = e0ktc[3:6, 0:1]
+#print('e0_tc:\n', e0_tc)
+#print()
 
+kapa_tc = e0ktc[3:6, 0:1]
+#print('kapa_tc:\n', kapa_tc)
+#print()
 
 strains_tc = []
 
@@ -339,6 +395,14 @@ for f in range(0, len(SST)):
     M_strains.append(M_strain)
 #print(M_strains)
 
+#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+
+#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, M_strains)}
+#df = pd.DataFrame(data, index=['epsilon x', 'epsilon y', 'gama'])
+
+# Print the DataFrame
+#print(df)
+
 # M stresses
 repeated_list = [num for num in h[1:-1] for _ in range(2)]
 h = [h[0]] + repeated_list + [h[-1]]
@@ -354,6 +418,13 @@ for z in SST:
     a += 1
 #print(stresses)
 
+#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+
+#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, stresses)}
+#df = pd.DataFrame(data, index=['sigma x', 'sigma y', 'tau'])
+
+# Print the DataFrame
+#print(df)
 
 # Tsi-Wu Failure theory
 
@@ -586,5 +657,5 @@ plt.plot(xd, yd, marker='o')
 del SS[int(second/2)]
 del SS[int(second/2)]
 
-last_ply = SS[0]
+#last_ply = SS[0]
 #print(last_ply)
