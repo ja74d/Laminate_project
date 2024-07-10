@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import math
 
 E1 = 181e+09
@@ -55,7 +56,7 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [0, 90, 0]
+SS = [0, 30, -45]
 SST = [num for num in SS for _ in range(2)]
 
 #Q1 = np.matrix('181.8 2.897 0; 2.897 10.35 0; 0 0 7.17')*1e+09
@@ -100,6 +101,8 @@ for n in range(0, nl):
     hi = h[n] + h_
     h.append(hi)
 
+#for er in range(len(SS)):
+#    print(f'teta = {SS[er]}:\n', Q_(Q1, SS[er]))
 
 # A Matrix
 
@@ -112,8 +115,8 @@ A_prime = np.linalg.inv(A)
 
 
 
-#print(A)
-
+#print('A:', A)
+#print()
 # B Matrix
 
 B = np.zeros((3, 3))
@@ -123,7 +126,8 @@ for j in range(0, len(SS)):
 
 B_prime = np.linalg.inv(B)
 
-#print(B)
+#print('B:', B)
+#print()
 # D Matrix
 
 D = np.zeros((3, 3))
@@ -133,7 +137,8 @@ for ka in range(0, len(SS)):
 
 D_prime = np.linalg.inv(D)
 
-#print(D)
+#print('D:', D)
+#print()
 
 #in-plane Engineering constants
 
@@ -203,7 +208,7 @@ def ABD(a11, b11, c11):
 ABD(A, B, D)
 #print(k)
 
-N = np.matrix('1; 0; 0; 0; 0; 0')
+N = np.matrix('1000; 1000; 0; 0; 0; 0')
 
 #mid-plane strain and curve
 
@@ -217,7 +222,7 @@ SST = [num for num in SS for _ in range(2)]
 
 
 def ek(k):
-    global local_strains, local_stresses, e0, kapa
+    global local_strains, local_stresses, e0, kapa, strains, stresses
     # Calculate e0 and kapa
     e0k = np.linalg.inv(k) @ N
     e0 = e0k[0:3, 0:1]
@@ -245,7 +250,18 @@ def ek(k):
 
     return local_strains, local_stresses
 ek(k)
+#print('e0:\n', e0)
+#print()
+#print('kapa:\n', kapa)
 
+#tables for stress and strain in top and bottom for each ply
+name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+
+data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, local_strains)}
+df = pd.DataFrame(data, index=['epsilon 1', 'epsilon 2', 'gama'])
+
+# Print the DataFrame
+#print(df)
 
 #T and C (hygrothermal)
 
@@ -368,9 +384,23 @@ for strs in stresses:
     simgamxn1 = ((sigmax+sigmay)/2) + (((sigmax-sigmay)/2)**2+(tau)**2)**0.5
     sigmamxn2 = ((sigmax+sigmay)/2) - (((sigmax-sigmay)/2)**2+(tau)**2)**0.5
     taumax = (((sigmax-sigmay)/2)**2+(tau)**2)**0.5
-    mxn = [simgamxn1, sigmamxn2, taumax]
-    max_stress.append(mxn)
-print(max_stress)
+    sigmamxn = [simgamxn1, sigmamxn2, taumax]
+    max_stress.append(sigmamxn)
+#print(max_stress)
+
+#maximum strains
+max_strain = []
+for strn in strains:
+    epsx = float(strn[0])
+    epsy = float(strn[1])
+    gama = float(strn[2])
+    epsmxn1 = ((epsx+epsy)/2) + (((epsx-epsy)/2)**2+(gama)**2)**0.5
+    epsmxn2 = ((epsx+epsy)/2) - (((epsx-epsy)/2)**2+(gama)**2)**0.5
+    gamamax = (((epsx-epsy)/2)**2+(gama)**2)**0.5
+    epsmxn = [epsmxn1, epsmxn2, gamamax]
+    max_strain.append(epsmxn)
+#print(max_strain)
+
 
 def Tsiwu(local_stresses):
     global Tsi_wu, Tsi_wu_stress
