@@ -1,0 +1,191 @@
+commit faedee06f5e9e971a47f546acbc0563bb80c0755
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Wed Jul 10 18:04:11 2024 +0330
+
+    moist
+
+commit e23585c918d83caa769631764f73b15579e4bf41
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Wed Jul 10 10:50:43 2024 +0330
+
+    tables for stress and strain for top and bottom of each ply
+
+commit 59175019b4cf83f4934480734a5e5760ff49222f
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 23:07:27 2024 +0330
+
+    max stress for each layer
+
+commit 08a5000c511818ffeee530e5cfe02385f51d8c58
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 19:38:19 2024 +0330
+
+    reduced stiffness matrix from the mechanical properties
+
+commit fb5a46d2c13799cb6564bf5db9ae83fc84b82be0
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 17:40:33 2024 +0330
+
+    plot the stress strain
+
+commit 21dc6ace4927352d50420464a83b065557702e20
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 12:04:27 2024 +0330
+
+    tsi wu and tsi hill in functions
+
+commit 79ad8c5f7d2278291230540baaede2abffddef50
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 11:32:34 2024 +0330
+
+    functiom ek for eok-local strains and stresses
+
+commit 2d418a38383a281bbcc866a81a59abbc1be85fa6
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 10:32:53 2024 +0330
+
+    functions for NA NB ND
+
+commit c89138f48361367de84214699d5952d5400bc700
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jul 9 10:06:36 2024 +0330
+
+    k with function ABD
+
+commit 248c1cdd7495c69e385ed79f18ff06489c1c4143
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Mon Jul 8 16:55:28 2024 +0330
+
+    finding the first layer failure
+
+commit 8ff46a2cefdca3a6aba6766f985d84b273c39571
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Mon Jul 8 11:24:52 2024 +0330
+
+    f12
+
+commit 4f7978e3cf50d18392533b88cb98e48cd8f6d994
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Mon Jul 8 11:09:46 2024 +0330
+
+    Tsi-Wu failure theory
+
+commit 58a400877317eb86b2631139b79bd9aaffacc8c6
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Mon Jul 8 01:20:43 2024 +0330
+
+    M stresses
+
+commit 91473689efbf9e1e10a75d989a51d14ac1fb37f8
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Mon Jul 8 01:14:53 2024 +0330
+
+    mechanincal strains
+
+commit b48b9e15382115e927302d58d0195c707c52c877
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 23:16:06 2024 +0330
+
+    hygrothermal strains and curves
+
+commit 513180a2d3cdbeef98c90867c275eec8c789adb1
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 17:00:58 2024 +0330
+
+    number of layaers
+
+commit 5a882fbbd216a1818c49b27bba52dca5ae1be058
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 15:38:18 2024 +0330
+
+    local strains
+
+commit e32c0d0a4c2f17c4894d46972d49977f90ee21ae
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 13:13:14 2024 +0330
+
+    local stresses
+
+commit 35fc38ac5afbc90a7a005cafe948898c73684b70
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 11:35:13 2024 +0330
+
+    strains for t&b of each layar
+
+commit d59f64cdda3ba32e7ac06ae7b3aa976ae8a164b0
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 11:12:32 2024 +0330
+
+    strains for top and buttem of each layer
+
+commit deaa5f9fa0de76ca3684fc6254e0f722cd5b3db0
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 10:30:43 2024 +0330
+
+    midplane s&c
+
+commit 3fc925dd742225dd2be975a47aa49d5e7c7b5968
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sun Jul 7 09:55:25 2024 +0330
+
+    k and N matrix for strain and curve in mid-plane
+
+commit b34fc068c15e1474a4570060a84077bd0e19a56a
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Thu Jun 6 23:45:43 2024 +0330
+
+    local stresses and strains calculated
+
+commit bec9b555c969a5b86130039f77a2a339a47e2aa8
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Thu Jun 6 23:03:23 2024 +0330
+
+    TR matrix
+
+commit 3c8f90cd154fe6867acdb67391ad94a03e7b9f5a
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jun 4 21:34:48 2024 +0330
+
+    Flexural Engineering constants
+
+commit b21d8206a0aa4fb361c1badd151e0b928864e796
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Tue Jun 4 21:28:28 2024 +0330
+
+    in-plane Engineering constants
+
+commit 4d4b0ce903396f948bf86524c54e9a3dc6728d3b
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Sat Jun 1 00:06:28 2024 +0330
+
+    number of layesrs
+
+commit ffdd8a04a78ddbc16031b9fe522acbd2ca169203
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Fri May 31 23:57:25 2024 +0330
+
+    thickness of layers
+
+commit d0995de6c5485ee764b8d686c410b981343cf9ff
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Fri May 31 23:28:40 2024 +0330
+
+    Bending Stiffness Matrix (D)
+
+commit d44773da1be16a00b32dc737cedadaf4b710dec7
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Fri May 31 23:21:32 2024 +0330
+
+    Coupling Stiffness Matrix (B)
+
+commit 424858d9cdf4728179057e9307e1d5e0001b1063
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Fri May 31 23:09:43 2024 +0330
+
+    Extensional matrix(A)
+
+commit 475a5510d2e002ade974d55c2142f887342f0bac
+Author: Javad Pournosrat <Pournosrat.javad@gmail.com>
+Date:   Fri May 31 22:28:43 2024 +0330
+
+    creating reduced stiffness matrix

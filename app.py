@@ -56,8 +56,8 @@ def D_to_R(teta):
     return R_teta
 
 # Stacking Sequence
-SS = [30, 45]
-N = np.matrix('10e+08; 0; 0; 0; 0; 0')
+SS = [0, 90, 90, 0]
+N = np.matrix('1; 0; 0; 0; 0; 0')
 
 
 SST = [num for num in SS for _ in range(2)]
@@ -94,7 +94,7 @@ def Q_(Q, teta):
 nl = len(SS)
 
 #ply thickness
-h_ = 0.005
+h_ = 0.000125
 
 midplane = nl*h_
 h0 = ((-1)*midplane/2)
@@ -269,8 +269,8 @@ ek(k)
 #tables for stress and strain in top and bottom of each ply
 #name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
 
-#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, local_stresses)}
-#df = pd.DataFrame(data, index=['sigma 1', 'sigma 2', 'tau'])
+#data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, strains)}
+#df = pd.DataFrame(data, index=['epsilon x', 'epsilon y', 'tau'])
 
 # Print the DataFrame
 #print(df)
@@ -327,7 +327,7 @@ for ec in range(len(SS)):
 
 repeated_list3 = [num for num in strain_T[1:-1] for _ in range(2)]
 strain_T = [strain_T[0]] + repeated_list + [strain_T[-1]]
-
+strain_c = [strain_c[0]] + repeated_list + [strain_c[-1]]
 
 Ntc = np.zeros((3, 1))
 Mtc = np.zeros((3, 1))
@@ -389,13 +389,15 @@ for z in h:
 #print(strain_T)
 
 # Mechanical Strains
+
+
 M_strains = []
 for f in range(0, len(SST)):
-    M_strain = strains_tc[f] - strain_T[f]
+    M_strain = strains_tc[f] - strain_T[f] - strain_c[f]
     M_strains.append(M_strain)
 #print(M_strains)
 
-#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom']
 
 #data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, M_strains)}
 #df = pd.DataFrame(data, index=['epsilon x', 'epsilon y', 'gama'])
@@ -418,7 +420,7 @@ for z in SST:
     a += 1
 #print(stresses)
 
-#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom']
+#name = [f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom']
 
 #data = {name: mat.flatten().tolist()[0] for name, mat in zip(name, stresses)}
 #df = pd.DataFrame(data, index=['sigma x', 'sigma y', 'tau'])
@@ -501,6 +503,12 @@ def Tsiwu(local_stresses):
     return Tsi_wu, Tsi_wu_stress
 
 Tsiwu(local_stresses)
+#print(Tsi_wu)
+#data = Tsi_wu_stress
+#df = pd.DataFrame(data, index=[f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom'])
+
+#print(df)
+
 
 #Tsi-hill
 def Tsihill(local_stresses):
@@ -530,16 +538,23 @@ def Tsihill(local_stresses):
 
 Tsihill(local_stresses)
 
+#print(Tsi_hill)
+#data = Tsi_hill_stress
+#df = pd.DataFrame(data, index=[f'{SS[0]} top', f'{SS[0]} bottom', f'{SS[1]} top', f'{SS[1]} bottom', f'{SS[2]} top', f'{SS[2]} bottom'])
+
+#print(df)
+
 first = Tsi_hill_stress.index(min(Tsi_hill_stress))
 
 first_layar_failure = SS[int(first/2)]
 
+print('first ply', first_layar_failure)
 
 first_ply_stress = Tsi_wu_stress[first]
 
 first_ply_strain = min(Tsi_wu) * e0[0]
 
-# now how the fuck i`m spouse to set the stiffness of this layer to zero?
+# now how to set the stiffness of this layer to zero?
 
 new_stiffness = []
 for lay in SS:
@@ -577,11 +592,11 @@ def new_A(SS, stiffness, h):
     return NA, NA_prime
 
 new_A(SS, new_stiffness, h)
-#print(NA)
+#print('A:\n', NA)
 
 def new_B(SS, stiffness, h):
     global NB
-    global NB_prime
+    #global NB_prime
     # Initialize NB as a 3x3 zero matrix
     NB = np.zeros((3, 3))
 
@@ -590,11 +605,11 @@ def new_B(SS, stiffness, h):
         NB += 0.5 * stiffness[nj] * ((h[nj+1]) ** 2 - (h[nj]) ** 2)
 
     # Calculate the inverse of NB
-    NB_prime = np.linalg.inv(NB)
+    #NB_prime = np.linalg.inv(NB)
 
-    return NB, NB_prime
+    return NB
 new_B(SS, new_stiffness, h)
-#print(NB)
+#print('B:\n', NB)
 
 def new_D(SS, stiffness, h):
     global ND
@@ -612,12 +627,17 @@ def new_D(SS, stiffness, h):
     return ND, ND_prime
 new_D(SS, new_stiffness, h)
 
+#print('D:\n', ND)
+
 ABD(NA, NB, ND)
 
 #print(k)
 
 ek(k)
 
+#print('e0:\n', e0)
+#print()
+#print('kapa\n', kapa)
 
 Tsiwu(local_stresses)
 
@@ -637,6 +657,7 @@ else:
 
 #print(local_stresses)
 
+
 second = Tsi_wu_stress.index(min(Tsi_wu_stress))
 
 second_layar_failure = SS[int(second/2)]
@@ -645,17 +666,39 @@ second_ply_stress = Tsi_wu_stress[second]
 
 second_ply_strain = min(Tsi_wu) * e0[0]
 
+fff1 = min(float(first_ply_strain), float(second_ply_strain))
+fff2 = max(float(first_ply_strain), float(second_ply_strain))
 
+ggg1 = min(float(second_ply_stress), float(first_ply_stress))
+ggg2 = max(float(second_ply_stress), float(first_ply_stress))
 
-xd = [0, float(first_ply_strain), float(second_ply_strain)]
-yd = [0, float(first_ply_stress), float(second_ply_stress)]
+xd = [0, fff1, fff2]
+yd = [0, ggg1, ggg2]
 
-plt.plot(xd, yd, marker='o')
+#plt.plot(xd, yd, marker='o')
 
 #plt.show()
 
 del SS[int(second/2)]
 del SS[int(second/2)]
 
-#last_ply = SS[0]
+last_ply = SS[0]
+last_ply_layar_failure = SS[int(last_ply/2)]
+print('last ply', last_ply_layar_failure)
+last_ply_stress = Tsi_wu_stress[last_ply]
+last_ply_strain = min(Tsi_wu) * e0[0]
+
 #print(last_ply)
+
+fff1 = min(float(first_ply_strain), float(second_ply_strain))
+fff2 = max(float(first_ply_strain), float(second_ply_strain))
+
+ggg1 = min(float(second_ply_stress), float(first_ply_stress))
+ggg2 = max(float(second_ply_stress), float(first_ply_stress))
+
+xd = [0, fff1, fff2, float(last_ply_strain)]
+yd = [0, ggg1, ggg2, float(last_ply_stress)]
+
+plt.plot(xd, yd, marker='o')
+
+plt.show()
